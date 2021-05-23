@@ -1,6 +1,8 @@
 import flask
 from flask import request, jsonify
 from flask import abort
+from flask import make_response
+
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
@@ -35,26 +37,10 @@ def home():
 def api_all():
     return jsonify(books)
 
-
-
 @app.route('/api/v1/resources/books/<int:id>', methods=['GET'])
 def api_id(id):
-
-    # # checke if an ID was provided
-    # if 'id' in request.args:
-    #     id = int(request.args['id'])
-    # else:
-    #     return "Error: no ID field provided. Check the request id field and provide it, please"
     
-    # Creat the result list to send the result: list of dictionaies
-    # results = []
-
-    # make a search on the global dictionary *book*
-    # for book in books:
-    #     # add to results
-    #     if book['id'] == id:
-    #         results.append(book)
-
+    # Search for the given id
     result = [ book for book in books if book['id'] == id]
 
     if len(result) == 0 :
@@ -76,6 +62,13 @@ def creacte_book():
     'author':'Ursula K. le Guin',
     'first_sentence':'Whith a clamor of bells that set the swallows soaring, the Festival of Summer came to the city Omelas, bright-towered by the sea.',
     'year_pushield':'1973'},
+
+
+@app.errorhandler(404)
+def not_found(error):
+    # add a custom mensage for not found book item
+    return make_response(jsonify({'error':'Not found'}),404)
+
 
 
 app.run()
