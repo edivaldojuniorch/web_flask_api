@@ -1,6 +1,6 @@
 import flask
 from flask import request, jsonify
-
+from flask import abort
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
@@ -36,27 +36,46 @@ def api_all():
     return jsonify(books)
 
 
-@app.route('/api/v1/resources/books', methods=['GET'])
-def api_id():
 
-    # checke if an ID was provided
-    if 'id' in request.args:
-        id = int(request.args['id'])
+@app.route('/api/v1/resources/books/<int:id>', methods=['GET'])
+def api_id(id):
 
-    else:
-        return "error: no ID field provided. Check the request id field and provide it, please"
+    # # checke if an ID was provided
+    # if 'id' in request.args:
+    #     id = int(request.args['id'])
+    # else:
+    #     return "Error: no ID field provided. Check the request id field and provide it, please"
     
     # Creat the result list to send the result: list of dictionaies
-    results = []
+    # results = []
 
     # make a search on the global dictionary *book*
-    for book in books:
+    # for book in books:
+    #     # add to results
+    #     if book['id'] == id:
+    #         results.append(book)
 
-        # add to results
-        if book['id'] == id:
-            results.append(book)
+    result = [ book for book in books if book['id'] == id]
+
+    if len(result) == 0 :
+        abort (404)
+
 
     # jsonfy flask functino to convert the list of dictionaries
-    return jsonify(results)
+    return jsonify(result)
+
+
+@app.route('/api/v1/resources/books/', methods=['POST'])
+def creacte_book():
+    if not request.json or not 'title' in request.json:
+        abort (400)
+
+    # all data was provided
+        {'id':1,
+    'title':'The Oner who walk away from omelas',
+    'author':'Ursula K. le Guin',
+    'first_sentence':'Whith a clamor of bells that set the swallows soaring, the Festival of Summer came to the city Omelas, bright-towered by the sea.',
+    'year_pushield':'1973'},
+
 
 app.run()
