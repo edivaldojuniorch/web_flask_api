@@ -53,15 +53,23 @@ def api_id(id):
 
 @app.route('/api/v1/resources/books/', methods=['POST'])
 def creacte_book():
+
     if not request.json or not 'title' in request.json:
+        #bad request
         abort (400)
 
-    # all data was provided
-        {'id':1,
-    'title':'The Oner who walk away from omelas',
-    'author':'Ursula K. le Guin',
-    'first_sentence':'Whith a clamor of bells that set the swallows soaring, the Festival of Summer came to the city Omelas, bright-towered by the sea.',
-    'year_pushield':'1973'},
+    # all data was provided, so add a new book
+    book = {
+        'id': books[-1]['id']+1,
+    'title': request.json['title'],
+    'author':request.json['author'],
+    'first_sentence':request.json['first_sentence'],
+    'year_pushield':request.json['year_pushield']}
+
+    # append to global books var
+    books.append(book)
+
+    return jsonify({'book':book}),201
 
 
 @app.errorhandler(404)
