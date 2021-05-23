@@ -2,6 +2,7 @@ import flask
 from flask import request, jsonify
 from flask import abort
 from flask import make_response
+from flask import url_for
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -35,7 +36,7 @@ def home():
 
 @app.route('/api/v1/resources/books/all',methods=['GET'])
 def api_all():
-    return jsonify(books)
+    return jsonify({'books': [make_public_book(book) for book in books]})
 
 @app.route('/api/v1/resources/books/<int:id>', methods=['GET'])
 def api_id(id):
@@ -111,15 +112,27 @@ def delete_book(id):
     # remove from books data storage
     result.remove(result[0])
 
-
     return jsonify({'result': True})
-
 
 
 @app.errorhandler(404)
 def not_found(error):
     # add a custom mensage for not found book item
     return make_response(jsonify({'error':'Not found'}),404)
+
+# expose de URL for user. Improviment on service interface
+def make_public_book(book):
+    new_book = {}
+
+    for field in book:
+
+        if field == 'id':
+            new_book['uri'] = url_for('api_all', id=book['id'], _external=True)
+
+        else:
+            new_book[field] = book[field]
+    
+    return new_book
 
 
 
