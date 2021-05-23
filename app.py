@@ -51,7 +51,7 @@ def api_id(id):
     return jsonify(result)
 
 
-@app.route('/api/v1/resources/books/', methods=['POST'])
+@app.route('/api/v1/resources/books', methods=['POST'])
 def creacte_book():
 
     if not request.json or not 'title' in request.json:
@@ -71,11 +71,41 @@ def creacte_book():
 
     return jsonify({'book':book}),201
 
+@app.route('/api/v1/resources/books/<int:id>', methods =['PUT'])
+def update_book(id):
+    # seach on the global book var
+    result = [book for book in books if book['id'] == id]
+
+    # test if every parametes was recived
+    if len(result) == 0:
+        abort(404) # not found
+    if not request.get_json():
+        abort(400) # bad request
+    if 'title'  in request.json and isinstance(type(request.json['title']),str):
+        abort(400)
+    if 'author'  in request.json and isinstance(type(request.json['title']),str):
+        abort(400)
+    if 'first_sentence'  in request.json and isinstance(type(request.json['first_sentence']),str):
+        abort(400)
+    if 'year_pushield'  in request.json and isinstance(type(request.json['year_pushield']),int):
+        abort(400)
+
+    # updant the values
+    result[0]['title'] = request.json.get('title', result[0]['title'])
+    result[0]['author'] = request.json.get('author', result[0]['author'])
+    result[0]['first_sentence'] = request.json.get('first_sentence', result[0]['first_sentence'])
+    result[0]['year_pushield'] = request.json.get('year_pushield', result[0]['year_pushield'])
+    
+    return jsonify({'book': result})
+
+
+
 
 @app.errorhandler(404)
 def not_found(error):
     # add a custom mensage for not found book item
     return make_response(jsonify({'error':'Not found'}),404)
+
 
 
 
