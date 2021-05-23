@@ -98,6 +98,21 @@ def update_book(id):
     
     return jsonify({'book': result})
 
+@app.route('/api/v1/resources/books/<int:id>', methods=['DELETE'])
+def delete_book(id):
+
+    # seach on the global book var
+    result = [book for book in books if book['id']==id]
+
+    # Verfiry existence
+    if len(result) == 0:
+        abort(404)
+
+    # remove from books data storage
+    result.remove(result[0])
+
+
+    return jsonify({'result': True})
 
 
 
