@@ -1,4 +1,4 @@
-import Flask
+import flask
 from flask import request, jsonify
 
 app = flask.Flask(__name__)
@@ -24,15 +24,39 @@ books = [
     'year_pushield':'1975'}
 ]
 
-@app.route('/', methods=[GET])
+@app.route('/', methods=['GET'])
 def home():
     return ''' 
     <h1> Distante Reading Archive</h1>
     <p>A prototype API for distant reading of science fiction novels.</p>
     '''
 
-@app.route('api/v1/resources/books/all',methods=[GET])
+@app.route('/api/v1/resources/books/all',methods=['GET'])
 def api_all():
     return jsonify(books)
+
+
+@app.route('/api/v1/resources/books', methods=['GET'])
+def api_id():
+
+    # checke if an ID was provided
+    if 'id' in request.args:
+        id = int(request.args['id'])
+
+    else:
+        return "error: no ID field provided. Check the request id field and provide it, please"
+    
+    # Creat the result list to send the result: list of dictionaies
+    results = []
+
+    # make a search on the global dictionary *book*
+    for book in books:
+
+        # add to results
+        if book['id'] == id:
+            results.append(book)
+
+    # jsonfy flask functino to convert the list of dictionaries
+    return jsonify(results)
 
 app.run()
