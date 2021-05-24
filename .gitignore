@@ -1,5 +1,4 @@
 # created by virtualenv automatically
 *
-.flaskenv
-__pycache__
-.gitignore
+requirements.txt
+app.py
