@@ -1,12 +1,15 @@
-import flask
+from flask import Flask
 from flask import request, jsonify
 from flask import abort
 from flask import make_response
 from flask import url_for
+from flask_cors import CORS, cross_origin
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
+CORS(app, supports_credentials=True)
+
 app.config["DEBUG"] = True
-
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 # fixed data to api interection
 books = [
@@ -35,6 +38,7 @@ def home():
     '''
 
 @app.route('/api/v1/resources/books/all',methods=['GET'])
+@cross_origin(supports_credentials=True)
 def api_all():
     return jsonify({'books': [make_public_book(book) for book in books]})
 
@@ -51,7 +55,7 @@ def api_id(id):
     # jsonfy flask functino to convert the list of dictionaries
     return jsonify(result)
 
-
+@cross_origin(origin="*")
 @app.route('/api/v1/resources/books', methods=['POST'])
 def creacte_book():
 
@@ -62,10 +66,10 @@ def creacte_book():
     # all data was provided, so add a new book
     book = {
         'id': books[-1]['id']+1,
-    'title': request.json['title'],
-    'author':request.json['author'],
-    'first_sentence':request.json['first_sentence'],
-    'year_pushield':request.json['year_pushield']}
+        'title': request.json['title'],
+        'author':request.json['author'],
+        'first_sentence':request.json['first_sentence'],
+        'year_pushield':request.json['year_pushield']}
 
     # append to global books var
     books.append(book)
@@ -127,14 +131,12 @@ def make_public_book(book):
     for field in book:
 
         if field == 'id':
-            new_book['uri'] = url_for('api_all', id=book['id'], _external=True)
+            new_book['uri'] = url_for('api_id', id=book['id'], _external=True)
 
         else:
             new_book[field] = book[field]
     
     return new_book
-
-
 
 
 app.run()
